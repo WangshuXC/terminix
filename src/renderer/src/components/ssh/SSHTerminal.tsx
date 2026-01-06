@@ -4,11 +4,12 @@ import { FitAddon } from '@xterm/addon-fit'
 import '@xterm/xterm/css/xterm.css'
 import '@/assets/terminal.css'
 
-interface TerminalModuleProps {
+interface SSHTerminalProps {
   tabId: string
+  onResize?: (cols: number, rows: number) => void
 }
 
-export default function TerminalModule({ tabId }: TerminalModuleProps) {
+export function SSHTerminal({ tabId, onResize }: SSHTerminalProps) {
   const terminalRef = useRef<HTMLDivElement>(null)
   const xtermRef = useRef<Terminal | null>(null)
   const fitAddonRef = useRef<FitAddon | null>(null)
@@ -17,15 +18,12 @@ export default function TerminalModule({ tabId }: TerminalModuleProps) {
   // Handle terminal resize
   const handleResize = useCallback(() => {
     if (fitAddonRef.current && xtermRef.current) {
-      try {
-        fitAddonRef.current.fit()
-        const { cols, rows } = xtermRef.current
-        window.terminalApi.resizePty({ id: tabId, cols, rows })
-      } catch {
-        // Ignore resize errors during initialization
-      }
+      fitAddonRef.current.fit()
+      const { cols, rows } = xtermRef.current
+      window.sshApi.resize({ id: tabId, cols, rows })
+      onResize?.(cols, rows)
     }
-  }, [tabId])
+  }, [tabId, onResize])
 
   useEffect(() => {
     if (!terminalRef.current || isInitializedRef.current) return
@@ -77,27 +75,25 @@ export default function TerminalModule({ tabId }: TerminalModuleProps) {
     setTimeout(() => {
       fitAddon.fit()
       const { cols, rows } = xterm
-
-      // Create PTY instance
-      window.terminalApi.createPty({ id: tabId, cols, rows })
-
-      // Handle user input
-      xterm.onData((data) => {
-        window.terminalApi.writePty(tabId, data)
-      })
+      onResize?.(cols, rows)
     }, 0)
 
-    // Listen for PTY output
-    const unsubscribeOutput = window.terminalApi.onPtyOutput(({ id, data }) => {
+    // Handle user input
+    xterm.onData((data) => {
+      window.sshApi.write(tabId, data)
+    })
+
+    // Listen for SSH output
+    const unsubscribeOutput = window.sshApi.onOutput(({ id, data }) => {
       if (id === tabId && xtermRef.current) {
         xtermRef.current.write(data)
       }
     })
 
-    // Listen for PTY exit
-    const unsubscribeExit = window.terminalApi.onPtyExit(({ id, exitCode }) => {
+    // Listen for SSH exit
+    const unsubscribeExit = window.sshApi.onExit(({ id, code }) => {
       if (id === tabId && xtermRef.current) {
-        xtermRef.current.write(`\r\n[Process exited with code ${exitCode}]\r\n`)
+        xtermRef.current.write(`\r\n[Session ended with code ${code}]\r\n`)
       }
     })
 
@@ -109,11 +105,10 @@ export default function TerminalModule({ tabId }: TerminalModuleProps) {
       window.removeEventListener('resize', handleResize)
       unsubscribeOutput()
       unsubscribeExit()
-      window.terminalApi.destroyPty(tabId)
       xterm.dispose()
       isInitializedRef.current = false
     }
-  }, [tabId, handleResize])
+  }, [tabId, handleResize, onResize])
 
   // Handle container resize using ResizeObserver
   useEffect(() => {

@@ -3,7 +3,8 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { ptyManager } from './ptyManager'
-import { IPC_CHANNELS, PtyCreateOptions, PtyResizeOptions } from '../shared/types'
+import { sshManager } from './sshManager'
+import { IPC_CHANNELS, PtyCreateOptions, PtyResizeOptions, SshConnectOptions, SshResizeOptions } from '../shared/types'
 
 function createWindow(): void {
   // Create the browser window.
@@ -76,6 +77,25 @@ app.whenReady().then(() => {
     ptyManager.destroy(id)
   })
 
+  // SSH IPC handlers
+  ipcMain.handle(IPC_CHANNELS.SSH_CONNECT, async (event, options: SshConnectOptions) => {
+    const window = BrowserWindow.fromWebContents(event.sender)
+    if (!window) return false
+    return sshManager.connect(options, window)
+  })
+
+  ipcMain.on(IPC_CHANNELS.SSH_WRITE, (_, { id, data }: { id: string; data: string }) => {
+    sshManager.write(id, data)
+  })
+
+  ipcMain.on(IPC_CHANNELS.SSH_RESIZE, (_, options: SshResizeOptions) => {
+    sshManager.resize(options)
+  })
+
+  ipcMain.on(IPC_CHANNELS.SSH_DISCONNECT, (_, id: string) => {
+    sshManager.disconnect(id)
+  })
+
   createWindow()
 
   app.on('activate', function () {
@@ -90,6 +110,7 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   ptyManager.destroyAll()
+  sshManager.disconnectAll()
   if (process.platform !== 'darwin') {
     app.quit()
   }

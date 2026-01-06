@@ -6,6 +6,7 @@ export interface Tab {
   id: string
   type: TabType
   label: string
+  hostId?: string // SSH tab 关联的 host ID
 }
 
 // 默认有一个vaults标签
@@ -25,18 +26,22 @@ export const activeTabAtom = atom((get) => {
 let sshCounter = 0
 let terminalCounter = 0
 
-// 添加新SSH标签的action atom
-export const addSshTabAtom = atom(null, (get, set) => {
-  sshCounter++
-  const newTab: Tab = {
-    id: `ssh-${sshCounter}`,
-    type: 'ssh',
-    label: `SSH ${sshCounter}`
+// 添加新SSH标签的action atom (支持传入 host 信息)
+export const addSshTabAtom = atom(
+  null,
+  (get, set, hostInfo?: { hostId: string; label: string }) => {
+    sshCounter++
+    const newTab: Tab = {
+      id: `ssh-${sshCounter}`,
+      type: 'ssh',
+      label: hostInfo?.label || `SSH ${sshCounter}`,
+      hostId: hostInfo?.hostId
+    }
+    set(tabsAtom, [...get(tabsAtom), newTab])
+    set(activeTabIdAtom, newTab.id)
+    return newTab
   }
-  set(tabsAtom, [...get(tabsAtom), newTab])
-  set(activeTabIdAtom, newTab.id)
-  return newTab
-})
+)
 
 // 添加新Terminal标签的action atom
 export const addTerminalTabAtom = atom(null, (get, set) => {
