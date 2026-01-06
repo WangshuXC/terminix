@@ -80,14 +80,10 @@ export default function EntryModule() {
     <div
       className={cn(
         'flex w-full flex-1 flex-col overflow-hidden bg-[#F5F5F5] md:flex-row dark:bg-neutral-800',
-        'h-screen pt-10'
+        'h-full'
       )}
     >
-      {/* 窗口拖拽区域 */}
-      <div
-        className="fixed top-0 left-0 right-0 h-10 z-50"
-        style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
-      />
+
       <Sidebar open={open} setOpen={setOpen}>
         <SidebarBody className="justify-between gap-10">
           <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
