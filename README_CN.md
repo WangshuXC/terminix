@@ -31,8 +31,9 @@
 ## 📸 截图
 
 <!-- 在此添加截图 -->
-| 本地终端 | SSH 连接 |
-|:--------:|:--------:|
+
+|                  本地终端                  |             SSH 连接             |
+| :----------------------------------------: | :------------------------------: |
 | ![Terminal](docs/screenshots/terminal.png) | ![SSH](docs/screenshots/ssh.png) |
 
 ## 🚀 安装
@@ -41,11 +42,11 @@
 
 从 [Releases](https://github.com/user/terminix/releases) 页面下载适合您平台的最新版本。
 
-| 平台 | 下载格式 |
-|------|----------|
-| macOS | `.dmg` |
-| Windows | `.exe` (NSIS 安装程序) |
-| Linux | `.AppImage` / `.deb` / `.snap` |
+| 平台    | 下载格式                       |
+| ------- | ------------------------------ |
+| macOS   | `.dmg`                         |
+| Windows | `.exe` (NSIS 安装程序)         |
+| Linux   | `.AppImage` / `.deb` / `.snap` |
 
 ### 从源码构建
 
@@ -87,17 +88,17 @@ npm run build:linux  # Linux
 
 ## 🛠️ 技术栈
 
-| 类别 | 技术 |
-|------|------|
-| 框架 | Electron 39 |
-| 前端 | React 19 |
-| 构建工具 | electron-vite |
-| 终端 | xterm.js 6 |
-| SSH 客户端 | ssh2 |
-| 状态管理 | Jotai |
-| 样式 | Tailwind CSS 4 |
-| 动画 | Motion (Framer Motion) |
-| 语言 | TypeScript 5 |
+| 类别       | 技术                   |
+| ---------- | ---------------------- |
+| 框架       | Electron 39            |
+| 前端       | React 19               |
+| 构建工具   | electron-vite          |
+| 终端       | xterm.js 6             |
+| SSH 客户端 | ssh2                   |
+| 状态管理   | Jotai                  |
+| 样式       | Tailwind CSS 4         |
+| 动画       | Motion (Framer Motion) |
+| 语言       | TypeScript 5           |
 
 ## 🏗️ 架构
 

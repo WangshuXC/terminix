@@ -34,7 +34,7 @@ By participating in this project, you agree to maintain a respectful and inclusi
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm 9+
 - Git
 
@@ -50,12 +50,12 @@ npm run dev
 
 ### Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Build for production |
-| `npm run lint` | Run ESLint |
-| `npm run format` | Format code with Prettier |
+| Command             | Description                  |
+| ------------------- | ---------------------------- |
+| `npm run dev`       | Start development server     |
+| `npm run build`     | Build for production         |
+| `npm run lint`      | Run ESLint                   |
+| `npm run format`    | Format code with Prettier    |
 | `npm run typecheck` | Run TypeScript type checking |
 
 ## Project Structure
@@ -81,6 +81,7 @@ src/
 ## Making Changes
 
 1. **Create a branch** for your changes:
+
    ```bash
    git checkout -b feature/your-feature-name
    # or
@@ -90,6 +91,7 @@ src/
 2. **Make your changes** following our code style guidelines
 
 3. **Test your changes** locally:
+
    ```bash
    npm run dev
    npm run lint
@@ -132,12 +134,14 @@ docs: update installation instructions
 ## Pull Request Process
 
 1. **Update your fork** with the latest upstream changes:
+
    ```bash
    git fetch upstream
    git rebase upstream/main
    ```
 
 2. **Push your branch** to your fork:
+
    ```bash
    git push origin feature/your-feature-name
    ```

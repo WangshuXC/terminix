@@ -31,8 +31,9 @@
 ## 📸 Screenshots
 
 <!-- Add your screenshots here -->
-| Local Terminal | SSH Connection |
-|:--------------:|:--------------:|
+
+|               Local Terminal               |          SSH Connection          |
+| :----------------------------------------: | :------------------------------: |
 | ![Terminal](docs/screenshots/terminal.png) | ![SSH](docs/screenshots/ssh.png) |
 
 ## 🚀 Installation
@@ -41,11 +42,11 @@
 
 Download the latest release for your platform from the [Releases](https://github.com/WangshuXC/terminix/releases) page.
 
-| Platform | Download |
-|----------|----------|
-| macOS | `.dmg` |
-| Windows | `.exe` (NSIS Installer) |
-| Linux | `.AppImage` / `.deb` / `.snap` |
+| Platform | Download                       |
+| -------- | ------------------------------ |
+| macOS    | `.dmg`                         |
+| Windows  | `.exe` (NSIS Installer)        |
+| Linux    | `.AppImage` / `.deb` / `.snap` |
 
 ### Build from Source
 
@@ -87,17 +88,17 @@ npm run build:linux  # Linux
 
 ## 🛠️ Tech Stack
 
-| Category | Technology |
-|----------|------------|
-| Framework | Electron 39 |
-| Frontend | React 19 |
-| Build Tool | electron-vite |
-| Terminal | xterm.js 6 |
-| SSH Client | ssh2 |
-| State Management | Jotai |
-| Styling | Tailwind CSS 4 |
-| Animation | Motion (Framer Motion) |
-| Language | TypeScript 5 |
+| Category         | Technology             |
+| ---------------- | ---------------------- |
+| Framework        | Electron 39            |
+| Frontend         | React 19               |
+| Build Tool       | electron-vite          |
+| Terminal         | xterm.js 6             |
+| SSH Client       | ssh2                   |
+| State Management | Jotai                  |
+| Styling          | Tailwind CSS 4         |
+| Animation        | Motion (Framer Motion) |
+| Language         | TypeScript 5           |
 
 ## 🏗️ Architecture
 
