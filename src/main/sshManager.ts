@@ -66,11 +66,11 @@ class SshManager {
     const { id, host, port, username, authType, password, privateKey, cols, rows } = options
 
     return new Promise((resolve) => {
-    if (this.connections.has(id)) {
-      console.warn(`SSH 连接 ${id} 已存在`)
-      resolve(false)
-      return
-    }
+      if (this.connections.has(id)) {
+        console.warn(`SSH 连接 ${id} 已存在`)
+        resolve(false)
+        return
+      }
 
       const client = new Client()
       const connection: SshConnection = {
