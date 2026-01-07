@@ -51,25 +51,19 @@ jobs:
 
       - name: Build Electron app (Linux)
         if: matrix.os == 'ubuntu-latest'
-        run: |
-          npm run build
-          electron-builder --linux --publish=never
+        run: npm run build:linux:release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Electron app (Windows)
         if: matrix.os == 'windows-latest'
-        run: |
-          npm run build
-          electron-builder --win --publish=never
+        run: npm run build:win:release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Electron app (macOS)
         if: matrix.os == 'macos-latest'
-        run: |
-          npm run build
-          electron-builder --mac --publish=never
+        run: npm run build:mac:release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
