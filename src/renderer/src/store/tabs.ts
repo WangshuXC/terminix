@@ -1,6 +1,6 @@
 import { atom } from 'jotai'
 
-export type TabType = 'vaults' | 'ssh' | 'terminal'
+export type TabType = 'vaults' | 'ssh'
 
 export interface Tab {
   id: string
@@ -24,7 +24,6 @@ export const activeTabAtom = atom((get) => {
 
 // 用于生成唯一ID的计数器
 let sshCounter = 0
-let terminalCounter = 0
 
 // 添加新SSH标签的action atom (支持传入 host 信息)
 export const addSshTabAtom = atom(
@@ -51,19 +50,6 @@ export const addSshTabAtom = atom(
     return newTab
   }
 )
-
-// 添加新Terminal标签的action atom
-export const addTerminalTabAtom = atom(null, (get, set) => {
-  terminalCounter++
-  const newTab: Tab = {
-    id: `terminal-${terminalCounter}`,
-    type: 'terminal',
-    label: terminalCounter === 1 ? 'Local Terminal' : `Local Terminal - ${terminalCounter - 1}`
-  }
-  set(tabsAtom, [...get(tabsAtom), newTab])
-  set(activeTabIdAtom, newTab.id)
-  return newTab
-})
 
 // 关闭标签的action atom
 export const closeTabAtom = atom(null, (get, set, tabId: string) => {

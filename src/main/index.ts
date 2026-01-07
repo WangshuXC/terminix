@@ -2,12 +2,9 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { ptyManager } from './ptyManager'
 import { sshManager } from './sshManager'
 import {
   IPC_CHANNELS,
-  PtyCreateOptions,
-  PtyResizeOptions,
   SshConnectOptions,
   SshResizeOptions
 } from '../shared/types'
@@ -63,25 +60,6 @@ app.whenReady().then(() => {
   // IPC 测试
   ipcMain.on('ping', () => console.log('pong'))
 
-  // PTY IPC 处理器
-  ipcMain.handle(IPC_CHANNELS.PTY_CREATE, (event, options: PtyCreateOptions) => {
-    const window = BrowserWindow.fromWebContents(event.sender)
-    if (!window) return false
-    return ptyManager.create(options, window)
-  })
-
-  ipcMain.on(IPC_CHANNELS.PTY_DATA, (_, { id, data }: { id: string; data: string }) => {
-    ptyManager.write(id, data)
-  })
-
-  ipcMain.on(IPC_CHANNELS.PTY_RESIZE, (_, options: PtyResizeOptions) => {
-    ptyManager.resize(options)
-  })
-
-  ipcMain.on(IPC_CHANNELS.PTY_DESTROY, (_, id: string) => {
-    ptyManager.destroy(id)
-  })
-
   // SSH IPC 处理器
   ipcMain.handle(IPC_CHANNELS.SSH_CONNECT, async (event, options: SshConnectOptions) => {
     const window = BrowserWindow.fromWebContents(event.sender)
@@ -114,7 +92,6 @@ app.whenReady().then(() => {
 // 在 macOS 上，应用和菜单栏通常保持活动状态
 // 直到用户使用 Cmd + Q 显式退出
 app.on('window-all-closed', () => {
-  ptyManager.destroyAll()
   sshManager.disconnectAll()
   if (process.platform !== 'darwin') {
     app.quit()

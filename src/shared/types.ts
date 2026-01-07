@@ -1,11 +1,5 @@
 // IPC 通道名称
 export const IPC_CHANNELS = {
-  PTY_CREATE: 'pty:create',
-  PTY_DATA: 'pty:data',
-  PTY_RESIZE: 'pty:resize',
-  PTY_DESTROY: 'pty:destroy',
-  PTY_OUTPUT: 'pty:output',
-  PTY_EXIT: 'pty:exit',
   // SSH 通道
   SSH_CONNECT: 'ssh:connect',
   SSH_DISCONNECT: 'ssh:disconnect',
@@ -17,32 +11,6 @@ export const IPC_CHANNELS = {
   SSH_ERROR: 'ssh:error',
   SSH_EXIT: 'ssh:exit'
 } as const
-
-// PTY 创建选项
-export interface PtyCreateOptions {
-  id: string
-  cols: number
-  rows: number
-}
-
-// PTY 调整大小选项
-export interface PtyResizeOptions {
-  id: string
-  cols: number
-  rows: number
-}
-
-// PTY 数据负载
-export interface PtyDataPayload {
-  id: string
-  data: string
-}
-
-// PTY 退出负载
-export interface PtyExitPayload {
-  id: string
-  exitCode: number
-}
 
 // SSH 连接状态
 export type SshConnectionStatus =

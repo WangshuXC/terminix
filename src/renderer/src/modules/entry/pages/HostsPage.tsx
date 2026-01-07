@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAtom, useSetAtom } from 'jotai'
-import { addSshTabAtom, addTerminalTabAtom } from '@/store/tabs'
+import { addSshTabAtom } from '@/store/tabs'
 import { hostsAtom, addHostAtom, removeHostAtom, updateHostAtom, HostData } from '@/store/hosts'
 import { SlidePanel } from '@/components/ui/SlidePanel'
 import {
@@ -12,7 +12,7 @@ import {
 } from '@renderer/components/ui/AlertDialog'
 import { NewHostForm, NewHostFormData } from '../components/NewHostForm'
 import { HostCard } from '../components/HostCard'
-import { IconPlus, IconServer, IconTerminal2, IconX } from '@tabler/icons-react'
+import { IconPlus, IconServer, IconX } from '@tabler/icons-react'
 
 export default function HostsPage() {
   const [hosts] = useAtom(hostsAtom)
@@ -20,7 +20,6 @@ export default function HostsPage() {
   const removeHost = useSetAtom(removeHostAtom)
   const updateHost = useSetAtom(updateHostAtom)
   const addSshTab = useSetAtom(addSshTabAtom)
-  const addTerminalTab = useSetAtom(addTerminalTabAtom)
 
   const [isPanelOpen, setIsPanelOpen] = useState(false)
   const [editingHost, setEditingHost] = useState<HostData | null>(null)
@@ -66,22 +65,13 @@ export default function HostsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">Hosts</h1>
-        <div className="flex gap-3">
-          <button
-            onClick={() => addTerminalTab()}
-            className="flex items-center gap-2 cursor-pointer rounded-lg bg-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-300 dark:bg-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-600"
-          >
-            <IconTerminal2 size={18} />
-            Local Terminal
-          </button>
-          <button
-            onClick={() => setIsPanelOpen(true)}
-            className="flex items-center gap-2 cursor-pointer rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-sky-600/25 transition-all hover:bg-sky-800 hover:shadow-sky-600/40 active:scale-[0.98]"
-          >
-            <IconPlus size={18} />
-            New Host
-          </button>
-        </div>
+        <button
+          onClick={() => setIsPanelOpen(true)}
+          className="flex items-center gap-2 cursor-pointer rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-sky-600/25 transition-all hover:bg-sky-800 hover:shadow-sky-600/40 active:scale-[0.98]"
+        >
+          <IconPlus size={18} />
+          New Host
+        </button>
       </div>
 
       {/* Host Cards Grid */}

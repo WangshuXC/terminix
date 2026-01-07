@@ -5,7 +5,7 @@
 <h1 align="center">Terminix</h1>
 
 <p align="center">
-  A modern, cross-platform terminal emulator and SSH client built with Electron
+  A modern, cross-platform SSH client built with Electron
 </p>
 
 <p align="center">
@@ -22,7 +22,6 @@
 
 ## ✨ Features
 
-- **🖥️ Local Terminal** - Full-featured terminal emulator with native PTY support
 - **🔐 SSH Client** - Secure remote connections with password and private key authentication
 - **📑 Multi-Tab Interface** - Manage multiple sessions with persistent tab state
 - **🎨 Modern UI** - Beautiful, responsive interface with smooth animations
@@ -32,9 +31,9 @@
 
 <!-- Add your screenshots here -->
 
-|               Local Terminal               |          SSH Connection          |
-| :----------------------------------------: | :------------------------------: |
-| ![Terminal](docs/screenshots/terminal.png) | ![SSH](docs/screenshots/ssh.png) |
+|          SSH Connection          |
+| :------------------------------: |
+| ![SSH](docs/screenshots/ssh.png) |
 
 ## 🚀 Installation
 

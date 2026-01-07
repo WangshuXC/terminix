@@ -40,7 +40,6 @@
     "electron-updater": "^6.3.9",
     "jotai": "^2.16.1",
     "motion": "^12.24.0",
-    "node-pty": "^1.1.0",
     "ssh2": "^1.17.0",
     "tailwind-merge": "^3.4.0"
   },

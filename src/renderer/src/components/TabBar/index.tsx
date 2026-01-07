@@ -1,6 +1,6 @@
 import { useAtom, useSetAtom } from 'jotai'
 import { tabsAtom, activeTabIdAtom, closeTabAtom } from '@/store/tabs'
-import { IconX, IconTerminal2, IconEye, IconServer } from '@tabler/icons-react'
+import { IconX, IconEye, IconServer } from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
 
 const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
@@ -35,10 +35,8 @@ export default function TabBar() {
           >
             {tab.type === 'vaults' ? (
               <IconEye className="h-4 w-4 shrink-0" />
-            ) : tab.type === 'ssh' ? (
-              <IconServer className="h-4 w-4 shrink-0" />
             ) : (
-              <IconTerminal2 className="h-4 w-4 shrink-0" />
+              <IconServer className="h-4 w-4 shrink-0" />
             )}
             <span
               className={cn(

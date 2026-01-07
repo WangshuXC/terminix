@@ -2,8 +2,6 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import {
   IPC_CHANNELS,
-  PtyCreateOptions,
-  PtyResizeOptions,
   SshConnectOptions,
   SshResizeOptions,
   SshStatusPayload,
@@ -12,54 +10,6 @@ import {
   SshOutputPayload,
   SshExitPayload
 } from '../shared/types'
-
-// 渲染进程终端 API
-const terminalApi = {
-  // 创建新的 PTY 实例
-  createPty: (options: PtyCreateOptions): Promise<boolean> => {
-    return ipcRenderer.invoke(IPC_CHANNELS.PTY_CREATE, options)
-  },
-
-  // 向 PTY 发送数据
-  writePty: (id: string, data: string): void => {
-    ipcRenderer.send(IPC_CHANNELS.PTY_DATA, { id, data })
-  },
-
-  // 调整 PTY 大小
-  resizePty: (options: PtyResizeOptions): void => {
-    ipcRenderer.send(IPC_CHANNELS.PTY_RESIZE, options)
-  },
-
-  // 销毁 PTY
-  destroyPty: (id: string): void => {
-    ipcRenderer.send(IPC_CHANNELS.PTY_DESTROY, id)
-  },
-
-  // 监听 PTY 输出
-  onPtyOutput: (callback: (data: { id: string; data: string }) => void): (() => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, payload: { id: string; data: string }) => {
-      callback(payload)
-    }
-    ipcRenderer.on(IPC_CHANNELS.PTY_OUTPUT, handler)
-    return () => {
-      ipcRenderer.removeListener(IPC_CHANNELS.PTY_OUTPUT, handler)
-    }
-  },
-
-  // 监听 PTY 退出
-  onPtyExit: (callback: (data: { id: string; exitCode: number }) => void): (() => void) => {
-    const handler = (
-      _event: Electron.IpcRendererEvent,
-      payload: { id: string; exitCode: number }
-    ) => {
-      callback(payload)
-    }
-    ipcRenderer.on(IPC_CHANNELS.PTY_EXIT, handler)
-    return () => {
-      ipcRenderer.removeListener(IPC_CHANNELS.PTY_EXIT, handler)
-    }
-  }
-}
 
 // 渲染进程 SSH API
 const sshApi = {
@@ -144,7 +94,6 @@ const sshApi = {
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)
-    contextBridge.exposeInMainWorld('terminalApi', terminalApi)
     contextBridge.exposeInMainWorld('sshApi', sshApi)
   } catch (error) {
     console.error(error)
@@ -152,8 +101,6 @@ if (process.contextIsolated) {
 } else {
   // @ts-ignore (在 dts 中定义)
   window.electron = electronAPI
-  // @ts-ignore (在 dts 中定义)
-  window.terminalApi = terminalApi
   // @ts-ignore (在 dts 中定义)
   window.sshApi = sshApi
 }

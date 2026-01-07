@@ -2,12 +2,18 @@ import { useAtomValue } from 'jotai'
 import { activeTabAtom, tabsAtom } from '@/store/tabs'
 import EntryModule from './modules/entry'
 import SshModule from './modules/ssh'
-import TerminalModule from './modules/terminal'
 import TabBar from './components/TabBar'
+import { useMemo } from 'react'
 
 function App(): React.JSX.Element {
   const activeTab = useAtomValue(activeTabAtom)
   const tabs = useAtomValue(tabsAtom)
+
+  // 只渲染当前活跃的SSH实例，减少内存占用
+  const activeSshTabs = useMemo(
+    () => tabs.filter((tab) => tab.type === 'ssh' && tab.id === activeTab.id),
+    [tabs, activeTab.id]
+  )
 
   return (
     <div className="flex h-screen flex-col bg-neutral-900">
@@ -16,31 +22,12 @@ function App(): React.JSX.Element {
         {/* Vaults tab - always render when active */}
         {activeTab.type === 'vaults' && <EntryModule />}
 
-        {/* SSH tabs - keep all instances alive */}
-        {tabs
-          .filter((tab) => tab.type === 'ssh')
-          .map((tab) => (
-            <div
-              key={tab.id}
-              className="absolute inset-0"
-              style={{ display: activeTab.id === tab.id ? 'flex' : 'none' }}
-            >
-              <SshModule tabId={tab.id} />
-            </div>
-          ))}
-
-        {/* Terminal tabs - keep all instances alive */}
-        {tabs
-          .filter((tab) => tab.type === 'terminal')
-          .map((tab) => (
-            <div
-              key={tab.id}
-              className="absolute inset-0"
-              style={{ display: activeTab.id === tab.id ? 'flex' : 'none' }}
-            >
-              <TerminalModule tabId={tab.id} />
-            </div>
-          ))}
+        {/* SSH tabs - only render active tab */}
+        {activeSshTabs.map((tab) => (
+          <div key={tab.id} className="absolute inset-0 flex">
+            <SshModule tabId={tab.id} />
+          </div>
+        ))}
       </div>
     </div>
   )
