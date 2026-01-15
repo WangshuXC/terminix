@@ -16,10 +16,10 @@ type MenuItem =
 
 interface ActionsMenuProps {
   isLocal: boolean
-  showPermissions: boolean
+  showHiddenFiles: boolean
   onRefresh: () => void
   onCreateFolder: () => void
-  onTogglePermissions: () => void
+  onToggleHiddenFiles: () => void
   onUpload?: () => void
   onDownload?: () => void
   onChangePermissions?: () => void
@@ -27,10 +27,10 @@ interface ActionsMenuProps {
 
 export function ActionsMenu({
   isLocal,
-  showPermissions,
+  showHiddenFiles,
   onRefresh,
   onCreateFolder,
-  onTogglePermissions,
+  onToggleHiddenFiles,
   onUpload,
   onDownload,
   onChangePermissions
@@ -116,13 +116,13 @@ export function ActionsMenu({
   // 添加显示设置分隔符和选项
   menuItems.push({ separator: true })
   menuItems.push({
-    icon: showPermissions ? <IconEye size={16} /> : <IconEyeOff size={16} />,
-    label: showPermissions ? '隐藏权限列' : '显示权限列',
+    icon: showHiddenFiles ? <IconEyeOff size={16} /> : <IconEye size={16} />,
+    label: showHiddenFiles ? '收起隐藏文件' : '显示隐藏文件',
     onClick: () => {
-      onTogglePermissions()
+      onToggleHiddenFiles()
       setIsOpen(false)
     },
-    checked: showPermissions
+    checked: showHiddenFiles
   })
 
   return (
@@ -149,7 +149,7 @@ export function ActionsMenu({
               <button
                 key={index}
                 onClick={item.onClick}
-                className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-700"
+                className="flex w-full select-none items-center gap-3 px-3 py-2 text-left text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-700"
               >
                 {item.icon}
                 {item.label}

@@ -92,14 +92,26 @@ export function useSftpConnection(tabId: string, host: HostData | undefined) {
 
   // 挂载时自动连接，或 host 变化时重新连接
   useEffect(() => {
-    // 如果 host 变化了，先断开旧连接
+    // 如果 host 变化了，先断开旧连接并重置状态
     if (host?.id !== currentHostIdRef.current) {
       if (currentHostIdRef.current && state.isConnected) {
         window.sftpApi.disconnect(tabId)
       }
       currentHostIdRef.current = host?.id
-      // 使用 setTimeout 避免在 effect 中直接调用 setState
-      setTimeout(() => setState(initialState), 0)
+      isConnectingRef.current = false
+      // 如果有新 host，直接开始连接；否则重置状态
+      if (host) {
+        setTimeout(() => {
+          setState({
+            status: 'connecting',
+            error: null,
+            isConnected: false
+          })
+          connect()
+        }, 0)
+      } else {
+        setTimeout(() => setState(initialState), 0)
+      }
       return
     }
 

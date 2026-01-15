@@ -57,7 +57,7 @@ export const FilePanel = forwardRef<FilePanelRef, FilePanelProps>(function FileP
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set())
-  const [showPermissions, setShowPermissions] = useState(false)
+  const [showHiddenFiles, setShowHiddenFiles] = useState(true)
   const [contextMenu, setContextMenu] = useState<{
     x: number
     y: number
@@ -380,10 +380,10 @@ export const FilePanel = forwardRef<FilePanelRef, FilePanelProps>(function FileP
           {/* Actions 下拉菜单 */}
           <ActionsMenu
             isLocal={isLocal}
-            showPermissions={showPermissions}
+            showHiddenFiles={showHiddenFiles}
             onRefresh={loadFiles}
             onCreateFolder={handleCreateFolder}
-            onTogglePermissions={() => setShowPermissions(!showPermissions)}
+            onToggleHiddenFiles={() => setShowHiddenFiles(!showHiddenFiles)}
             onUpload={selectedFiles.size > 0 && onTransfer ? handleTransferSelected : undefined}
             onDownload={selectedFiles.size > 0 && onTransfer ? handleTransferSelected : undefined}
             onChangePermissions={
@@ -399,11 +399,10 @@ export const FilePanel = forwardRef<FilePanelRef, FilePanelProps>(function FileP
       {/* 文件列表 */}
       <div className="flex-1 overflow-hidden">
         <FileList
-          files={files}
+          files={showHiddenFiles ? files : files.filter((f) => !f.isHidden)}
           loading={loading}
           error={error}
           selectedFiles={selectedFiles}
-          showPermissions={showPermissions}
           onFileDoubleClick={handleFileDoubleClick}
           onFileSelect={handleFileSelect}
           onContextMenu={handleContextMenu}

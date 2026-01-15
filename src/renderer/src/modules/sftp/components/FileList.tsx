@@ -1,12 +1,23 @@
+import { useState, useMemo } from 'react'
 import type { FileItem } from '@shared/types'
-import { IconFolder, IconFile, IconLink, IconLoader2, IconAlertCircle } from '@tabler/icons-react'
+import {
+  IconFolder,
+  IconFile,
+  IconLink,
+  IconLoader2,
+  IconAlertCircle,
+  IconChevronUp,
+  IconChevronDown
+} from '@tabler/icons-react'
+
+type SortField = 'name' | 'modifiedTime' | 'size'
+type SortOrder = 'asc' | 'desc'
 
 interface FileListProps {
   files: FileItem[]
   loading: boolean
   error: string | null
   selectedFiles: Set<string>
-  showPermissions: boolean
   onFileDoubleClick: (file: FileItem) => void
   onFileSelect: (file: FileItem, selected: boolean) => void
   onContextMenu: (event: React.MouseEvent, file: FileItem | null) => void
@@ -17,19 +28,60 @@ export function FileList({
   loading,
   error,
   selectedFiles,
-  showPermissions,
   onFileDoubleClick,
   onFileSelect,
   onContextMenu
 }: FileListProps) {
+  const [sortField, setSortField] = useState<SortField>('name')
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortField(field)
+      setSortOrder('asc')
+    }
+  }
+
+  const sortedFiles = useMemo(() => {
+    return [...files].sort((a, b) => {
+      // 目录始终在前
+      if (a.type === 'directory' && b.type !== 'directory') return -1
+      if (a.type !== 'directory' && b.type === 'directory') return 1
+
+      let comparison = 0
+      switch (sortField) {
+        case 'name':
+          comparison = a.name.localeCompare(b.name)
+          break
+        case 'modifiedTime':
+          comparison = a.modifiedTime.getTime() - b.modifiedTime.getTime()
+          break
+        case 'size':
+          comparison = a.size - b.size
+          break
+      }
+      return sortOrder === 'asc' ? comparison : -comparison
+    })
+  }, [files, sortField, sortOrder])
+
+  const renderSortIcon = (field: SortField) => {
+    if (sortField !== field) return null
+    return sortOrder === 'asc' ? (
+      <IconChevronUp size={14} className="inline" />
+    ) : (
+      <IconChevronDown size={14} className="inline" />
+    )
+  }
   const getFileIcon = (file: FileItem) => {
     switch (file.type) {
       case 'directory':
-        return <IconFolder size={16} className="text-blue-500" />
+        return <IconFolder size={20} className="text-blue-400" />
       case 'symlink':
-        return <IconLink size={16} className="text-purple-500" />
+        return <IconLink size={20} className="text-purple-500" />
       default:
-        return <IconFile size={16} className="text-neutral-500" />
+        return <IconFile size={20} className="text-neutral-400" />
     }
   }
 
@@ -59,13 +111,15 @@ export function FileList({
   }
 
   const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date)
+    const month = date.getMonth() + 1
+    const day = date.getDate()
+    const year = date.getFullYear()
+    let hours = date.getHours()
+    const minutes = date.getMinutes().toString().padStart(2, '0')
+    const ampm = hours >= 12 ? 'PM' : 'AM'
+    hours = hours % 12
+    hours = hours ? hours : 12
+    return `${month}/${day}/${year}, ${hours}:${minutes} ${ampm}`
   }
 
   const formatPermissions = (file: FileItem) => {
@@ -120,27 +174,40 @@ export function FileList({
       <table className="w-full text-sm">
         <thead className="sticky top-0 z-10 bg-neutral-50 dark:bg-neutral-800">
           <tr className="border-b border-neutral-200 dark:border-neutral-700">
-            <th className="px-3 py-2 text-left font-medium text-neutral-700 dark:text-neutral-300">
-              Name
+            <th
+              className="cursor-pointer px-3 py-2 font-medium text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-700"
+              onClick={() => handleSort('name')}
+            >
+              <div className="flex items-center justify-between">
+                <span>Name</span>
+                {renderSortIcon('name')}
+              </div>
             </th>
-            <th className="px-3 py-2 text-left font-medium text-neutral-700 dark:text-neutral-300">
-              Date Modified
+            <th
+              className="cursor-pointer px-3 py-2 font-medium text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-700"
+              onClick={() => handleSort('modifiedTime')}
+            >
+              <div className="flex items-center justify-between">
+                <span>Date Modified</span>
+                {renderSortIcon('modifiedTime')}
+              </div>
             </th>
-            <th className="px-3 py-2 text-left font-medium text-neutral-700 dark:text-neutral-300">
-              Size
+            <th
+              className="cursor-pointer px-3 py-2 font-medium text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-700"
+              onClick={() => handleSort('size')}
+            >
+              <div className="flex items-center justify-between">
+                <span>Size</span>
+                {renderSortIcon('size')}
+              </div>
             </th>
             <th className="px-3 py-2 text-left font-medium text-neutral-700 dark:text-neutral-300">
               Kind
             </th>
-            {showPermissions && (
-              <th className="px-3 py-2 text-left font-medium text-neutral-700 dark:text-neutral-300">
-                Permissions
-              </th>
-            )}
           </tr>
         </thead>
         <tbody>
-          {files.map((file) => {
+          {sortedFiles.map((file) => {
             const isSelected = selectedFiles.has(file.path)
             const rowClass = isSelected
               ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700'
@@ -158,35 +225,37 @@ export function FileList({
                 onContextMenu={(e) => onContextMenu(e, file)}
               >
                 <td className="px-3 py-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     {getFileIcon(file)}
-                    <span className={file.isHidden ? 'text-neutral-400 dark:text-neutral-500' : ''}>
-                      {file.name}
-                    </span>
+                    <div className="flex flex-col">
+                      <span
+                        className={`text-xs ${file.isHidden ? 'text-neutral-400 dark:text-neutral-500' : ''}`}
+                      >
+                        {file.name}
+                      </span>
+                      <span
+                        className={`font-mono text-[10px] ${isSelected ? 'text-blue-200' : 'text-neutral-400 dark:text-neutral-500'}`}
+                      >
+                        {formatPermissions(file)}
+                      </span>
+                    </div>
                   </div>
                 </td>
                 <td
-                  className={`px-3 py-2 ${isSelected ? 'text-blue-100' : 'text-neutral-600 dark:text-neutral-400'}`}
+                  className={`px-3 py-2 text-xs ${isSelected ? 'text-blue-100' : 'text-neutral-600 dark:text-neutral-400'}`}
                 >
                   {formatDate(file.modifiedTime)}
                 </td>
                 <td
-                  className={`px-3 py-2 ${isSelected ? 'text-blue-100' : 'text-neutral-600 dark:text-neutral-400'}`}
+                  className={`px-3 py-2 text-xs ${isSelected ? 'text-blue-100' : 'text-neutral-600 dark:text-neutral-400'}`}
                 >
                   {file.type === 'directory' ? '-' : formatFileSize(file.size)}
                 </td>
                 <td
-                  className={`px-3 py-2 ${isSelected ? 'text-blue-100' : 'text-neutral-600 dark:text-neutral-400'}`}
+                  className={`px-3 py-2 text-xs ${isSelected ? 'text-blue-100' : 'text-neutral-600 dark:text-neutral-400'}`}
                 >
                   {getFileKind(file)}
                 </td>
-                {showPermissions && (
-                  <td
-                    className={`px-3 py-2 font-mono text-xs ${isSelected ? 'text-blue-100' : 'text-neutral-600 dark:text-neutral-400'}`}
-                  >
-                    {formatPermissions(file)}
-                  </td>
-                )}
               </tr>
             )
           })}

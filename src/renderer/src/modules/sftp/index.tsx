@@ -3,14 +3,8 @@ import { useAtomValue } from 'jotai'
 import { hostsAtom, HostData } from '@/store/hosts'
 import { useSftpConnection } from '@/hooks/useSftpConnection'
 import { FilePanel, FilePanelRef } from './components/FilePanel'
-import {
-  IconArrowLeft,
-  IconSearch,
-  IconServer,
-  IconSortAscending,
-  IconSortDescending,
-  IconRefresh
-} from '@tabler/icons-react'
+import { SftpConnecting } from './components/SftpConnecting'
+import { IconSearch, IconServer, IconSortAscending, IconSortDescending } from '@tabler/icons-react'
 
 type SortField = 'name' | 'address'
 type SortOrder = 'asc' | 'desc'
@@ -247,65 +241,6 @@ export default function SftpModule() {
     </div>
   )
 
-  // 渲染连接中页面
-  const renderConnectingPage = () => (
-    <div className="flex h-full flex-col bg-white dark:bg-neutral-800">
-      {/* Header with back button - 与左侧工具栏高度对齐 */}
-      <div className="flex items-center gap-2 border-b border-neutral-200 px-3 py-2 dark:border-neutral-700">
-        <button
-          onClick={handleDisconnect}
-          className="flex h-6 w-6 items-center justify-center rounded text-neutral-600 transition-colors hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
-        >
-          <IconArrowLeft className="h-4 w-4" />
-        </button>
-        <h1 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-          {selectedHost?.name}
-        </h1>
-      </div>
-
-      {/* 占位行 - 与左侧面包屑高度对齐 */}
-      <div className="flex items-center border-b border-neutral-200 bg-neutral-50 px-3 py-2 dark:border-neutral-700 dark:bg-neutral-800">
-        <span className="text-sm text-neutral-500 dark:text-neutral-400">
-          {selectedHost?.username}@{selectedHost?.address}:{selectedHost?.port}
-        </span>
-      </div>
-
-      {/* Connecting content */}
-      <div className="flex flex-1 items-center justify-center bg-white dark:bg-neutral-800">
-        <div className="flex flex-col items-center gap-4">
-          {status === 'connecting' && (
-            <>
-              <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600" />
-              <p className="text-sm text-neutral-600 dark:text-neutral-400">Connecting...</p>
-            </>
-          )}
-          {status === 'error' && (
-            <>
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
-                <IconServer className="h-8 w-8 text-red-600 dark:text-red-400" />
-              </div>
-              <p className="text-sm font-medium text-red-600 dark:text-red-400">
-                Connection failed
-              </p>
-              {error && (
-                <p className="max-w-xs text-center text-xs text-neutral-500 dark:text-neutral-400">
-                  {error}
-                </p>
-              )}
-              <button
-                onClick={reconnect}
-                className="mt-2 flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-              >
-                <IconRefresh className="h-4 w-4" />
-                Retry
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-
   return (
     <div className="flex h-full w-full">
       {/* 左侧本地文件面板 */}
@@ -339,7 +274,13 @@ export default function SftpModule() {
           />
         ) : (
           // 连接中页面
-          renderConnectingPage()
+          <SftpConnecting
+            host={selectedHost}
+            status={status}
+            error={error}
+            onClose={handleDisconnect}
+            onReconnect={reconnect}
+          />
         )}
       </div>
     </div>

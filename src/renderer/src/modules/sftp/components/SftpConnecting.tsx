@@ -22,57 +22,112 @@ export function SftpConnecting({ host, status, error, onClose, onReconnect }: Sf
   const isError = status === 'error'
   const isDisconnected = status === 'disconnected'
 
-  const getStatusText = () => {
+  // 根据状态计算进度
+  const getProgress = () => {
     switch (status) {
+      case 'idle':
+        return 0
       case 'connecting':
-        return 'Connecting to SFTP server...'
+        return 50
       case 'connected':
-        return 'Connected successfully!'
+        return 100
       case 'error':
-        return 'Connection failed'
       case 'disconnected':
-        return 'Disconnected'
+        return 50
       default:
-        return 'Initializing...'
+        return 0
     }
   }
 
-  const getStatusIcon = () => {
-    if (isConnecting) {
-      return <IconLoader2 size={24} className="animate-spin text-blue-500" />
-    } else if (isError) {
-      return <IconX size={24} className="text-red-500" />
-    } else if (status === 'connected') {
-      return <IconCheck size={24} className="text-green-500" />
-    } else {
-      return <IconServer size={24} className="text-neutral-500" />
-    }
-  }
+  const progress = getProgress()
 
   return (
     <div className="flex h-full w-full items-center justify-center bg-neutral-100 dark:bg-neutral-900">
-      <div className="w-full max-w-md px-6">
+      <div className="w-full max-w-2xl px-6">
         {/* Host Info Card */}
-        <div className="mb-8 flex items-center justify-center">
-          <div className="text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg shadow-green-500/30">
-              <IconFolder size={32} />
+        <div className="mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-linear-to-br from-green-500 to-green-600 text-white shadow-lg shadow-green-500/30">
+              <IconServer size={28} />
             </div>
-            <h2 className="text-lg font-semibold text-neutral-900 dark:text-white">
-              SFTP Connection
-            </h2>
-            <p className="text-sm text-neutral-500 dark:text-neutral-400">
-              {host.address}:{host.port}
-            </p>
+            <div>
+              <h2 className="text-lg font-semibold text-neutral-900 dark:text-white">
+                {host.name || host.address}
+              </h2>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                SFTP {host.username}@{host.address}:{host.port}
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Status */}
-        <div className="mb-6 text-center">
-          <div className="mb-3 flex justify-center">{getStatusIcon()}</div>
-          <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-            {getStatusText()}
-          </p>
+        {/* Progress Bar */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3">
+            <div
+              className={`flex h-8 w-8 items-center justify-center rounded-full ${
+                isError
+                  ? 'bg-red-100 text-red-500 dark:bg-red-900/30'
+                  : 'bg-green-100 text-green-500 dark:bg-green-900/30'
+              }`}
+            >
+              {isConnecting ? (
+                <IconLoader2 size={18} className="animate-spin" />
+              ) : isError ? (
+                <IconX size={18} />
+              ) : (
+                <IconServer size={18} />
+              )}
+            </div>
+
+            <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700">
+              <div
+                className={`absolute left-0 top-0 h-full rounded-full transition-all duration-500 ${
+                  isError ? 'bg-red-500' : 'bg-linear-to-r from-green-500 to-green-600'
+                }`}
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+
+            <div
+              className={`flex h-8 w-8 items-center justify-center rounded-full ${
+                progress >= 100
+                  ? 'bg-green-100 text-green-500 dark:bg-green-900/30'
+                  : 'bg-neutral-200 text-neutral-400 dark:bg-neutral-700'
+              }`}
+            >
+              {progress >= 100 ? <IconCheck size={18} /> : <IconFolder size={18} />}
+            </div>
+          </div>
+        </div>
+
+        {/* Status Message */}
+        <div className="mb-8 rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800">
+          <div className="flex items-center gap-2">
+            {isConnecting ? (
+              <>
+                <IconLoader2 size={16} className="animate-spin text-green-500" />
+                <p className="text-sm text-neutral-700 dark:text-neutral-300">
+                  Establishing SFTP connection...
+                </p>
+              </>
+            ) : isError ? (
+              <>
+                <IconX size={16} className="text-red-500" />
+                <p className="text-sm text-red-700 dark:text-red-400">Connection failed</p>
+              </>
+            ) : isDisconnected ? (
+              <>
+                <IconX size={16} className="text-neutral-500" />
+                <p className="text-sm text-neutral-700 dark:text-neutral-300">Disconnected</p>
+              </>
+            ) : (
+              <>
+                <IconCheck size={16} className="text-green-500" />
+                <p className="text-sm text-green-700 dark:text-green-400">Connected successfully</p>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Error Message */}
@@ -99,9 +154,9 @@ export function SftpConnecting({ host, status, error, onClose, onReconnect }: Sf
           {(isError || isDisconnected) && (
             <button
               onClick={onReconnect}
-              className="rounded-lg bg-gradient-to-r from-green-500 to-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-lg shadow-green-500/25 transition-all hover:from-green-600 hover:to-green-700 hover:shadow-green-500/40"
+              className="rounded-lg bg-linear-to-r from-green-500 to-green-600 px-6 py-2.5 text-sm font-medium text-white shadow-lg shadow-green-500/25 transition-all hover:from-green-600 hover:to-green-700 hover:shadow-green-500/40"
             >
-              Retry
+              Start over
             </button>
           )}
         </div>
